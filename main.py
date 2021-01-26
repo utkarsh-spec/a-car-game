@@ -51,11 +51,53 @@ class Projectile(object):
         pygame.draw.circle(display, self.color, (self.x, self.y), self.radius)
 
 
+class Enemy(object):
+    enemy = pygame.image.load('Car.png')
+
+    def __init__(self, x, y, width, height, end):
+        self.x = x
+        self.y = y
+        self.height = height
+        self.width = width
+        self.end = end
+        self.path = [self.y, self.end]
+        self.run_count = 0
+        self.vel = 5
+
+    def draw(self, display):
+        self.move()
+        if self.vel > 0:
+            display.blit(self.enemy, (self.x, self.y))
+            self.run_count +=1
+
+    def move(self):
+        if self.vel > 0:
+            if self.y < self.vel + self.path[1]:
+                self.y += self.vel
+            else:
+                self.vel = self.vel * -1
+                self.run_count = 0
+        else:
+            if self.y - self.vel > self.path[0]:
+                self.y += self.vel
+            else:
+                self.vel = self.vel * -1
+                self.run_count = 0
+
+
 car = Player(225, 350, 100, 216)
+enm = Enemy(100, -211, 91, 211, 600)
+enm2 = Enemy(350, -211, 91, 211, 600)
+enm3 = Enemy(500, -211, 91, 211, 600)
+enm4 = Enemy(200, -211, 91, 211, 600)
 
 
 def game_window():
     car.move(display)
+    enm.draw(display)
+    enm2.draw(display)
+    enm3.draw(display)
+    enm4.draw(display)
     for bullet in bullets:
         bullet.draw(display)
     pygame.display.update()
@@ -88,7 +130,7 @@ while run:
         if car.x > 100:
             car.x -= car.vel
     # right arrow key input
-    elif keys[pygame.K_RIGHT] and car.x < 500 - car.width - car.vel:
+    elif keys[pygame.K_RIGHT] and car.x < 600 - car.width - car.vel:
         car.x += car.vel
     else:
         car.run_count = 0
