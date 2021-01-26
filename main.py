@@ -20,9 +20,8 @@ class Player(object):
         self.width = width
         self.height = height
         self.vel = 20
-        self.car_move = True  # replace left with car_move and deleted right
+        self.car_move = True
         self.bg_move = True
-        self.run_count = 0
         self.bg_count = 0
 
 # player movement
@@ -30,7 +29,7 @@ class Player(object):
 
         if self.bg_count + 1 >= 9:
             self.bg_count = 0
-            
+
         if self.bg_move:
             display.blit(bg[self.bg_count // 3], (0, 0))
             self.bg_count += 1
@@ -40,15 +39,30 @@ class Player(object):
             self.bg_count += 1
 
 
-car = Player(225, 350, 10, 30)
+class Projectile(object):
+    def __init__(self, x, y, radius, color):
+        self.x = x
+        self.y = y
+        self.radius = radius
+        self.color = color
+        self.vel = 20
+
+    def draw(self, display):
+        pygame.draw.circle(display, self.color, (self.x, self.y), self.radius)
+
+
+car = Player(225, 350, 100, 216)
 
 
 def game_window():
     car.move(display)
+    for bullet in bullets:
+        bullet.draw(display)
     pygame.display.update()
 
 
 run = True
+bullets = []
 # main window
 while run:
     clock.tick(18)
@@ -57,7 +71,18 @@ while run:
         if event.type == pygame.QUIT:
             run = False
 
+    for bullet in bullets:
+
+        if bullet.x < 650 and bullet.x > 0:
+            bullet.y -= bullet.vel
+        else:
+            bullets.pop(bullets.index(bullet))
+
     keys = pygame.key.get_pressed()
+
+    if keys[pygame.K_SPACE]:
+        if len(bullets) < 500:
+            bullets.append(Projectile(round(car.x + car.width//2), round(car.y), 4, (0, 0, 0)))
     # left arrow key input
     if keys[pygame.K_LEFT] and car.x > car.vel:
         if car.x > 100:
