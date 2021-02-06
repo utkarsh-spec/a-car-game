@@ -8,7 +8,7 @@ pygame.display.set_caption("a Car Game")
 move_right = [pygame.image.load('1.png'), pygame.image.load('2.png'), pygame.image.load('3.png')]
 move_left = [pygame.image.load('1.png'), pygame.image.load('2.png'), pygame.image.load('3.png')]
 bg = [pygame.image.load('background-1.png'), pygame.image.load('background-2.png'), pygame.image.load('background-3.png')]
-# char = pygame.image.load('1.png')
+enemy = pygame.image.load('Car.png')
 
 clock = pygame.time.Clock()
 
@@ -54,50 +54,28 @@ class Projectile(object):
 class Enemy(object):
     enemy = pygame.image.load('Car.png')
 
-    def __init__(self, x, y, width, height, end):
+    def __init__(self, x, y):
         self.x = x
         self.y = y
-        self.height = height
-        self.width = width
-        self.end = end
-        self.path = [self.y, self.end]
-        self.run_count = 0
         self.vel = 5
 
     def draw(self, display):
+        display.blit(enemy, (self.x, self.y))
         self.move()
-        if self.vel > 0:
-            display.blit(self.enemy, (self.x, self.y))
-            self.run_count +=1
 
     def move(self):
-        if self.vel > 0:
-            if self.y < self.vel + self.path[1]:
-                self.y += self.vel
-            else:
-                self.vel = self.vel * -1
-                self.run_count = 0
-        else:
-            if self.y - self.vel > self.path[0]:
-                self.y += self.vel
-            else:
-                self.vel = self.vel * -1
-                self.run_count = 0
+        if self.y < 600:
+            self.y += self.vel
+            if self.y == 600:
+                self.y = -200
 
 
-car = Player(225, 350, 100, 216)
-enm = Enemy(100, -211, 91, 211, 600)
-enm2 = Enemy(350, -211, 91, 211, 600)
-enm3 = Enemy(500, -211, 91, 211, 600)
-enm4 = Enemy(200, -211, 91, 211, 600)
-
-
+# main loop
 def game_window():
     car.move(display)
     enm.draw(display)
     enm2.draw(display)
-    enm3.draw(display)
-    enm4.draw(display)
+
     for bullet in bullets:
         bullet.draw(display)
     pygame.display.update()
@@ -105,16 +83,18 @@ def game_window():
 
 run = True
 bullets = []
-# main window
+# object generator
+car = Player(225, 350, 100, 216)
+enm = Enemy(100, 100)
+enm2 = Enemy(350, 400)
+
 while run:
     clock.tick(18)
-# closing window loop
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
 
     for bullet in bullets:
-
         if bullet.x < 650 and bullet.x > 0:
             bullet.y -= bullet.vel
         else:
@@ -134,7 +114,7 @@ while run:
         car.x += car.vel
     else:
         car.run_count = 0
-
+    # main function loop
     game_window()
 
 pygame.quit()
