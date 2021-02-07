@@ -57,7 +57,7 @@ class Enemy(object):
     def __init__(self, x, y):
         self.x = x
         self.y = y
-        self.vel = 5
+        self.vel = 3
 
     def draw(self, display):
         display.blit(enemy, (self.x, self.y))
@@ -66,15 +66,44 @@ class Enemy(object):
     def move(self):
         if self.y < 600:
             self.y += self.vel
-            if self.y == 600:
+            if self.y >= 600:
                 self.y = -200
+                if self.vel <= 10:
+                    self.vel += 1
+
+
+car1 = True
+car2 = False
+car3 = False
+car4 = False
+
+
+def effect(display):
+    global car1
+    global car2
+    global car3
+    global car4
+
+    if enm.y > 200:
+        car2 = True
+    if enm2.y > 200:
+        car3 = True
+    if enm3.y > 200:
+        car4 = True
+    if car1:
+        enm.draw(display)
+    if car2:
+        enm2.draw(display)
+    if car3:
+        enm3.draw(display)
+    if car4:
+        enm4.draw(display)
 
 
 # main loop
 def game_window():
     car.move(display)
-    enm.draw(display)
-    enm2.draw(display)
+    effect(display)
 
     for bullet in bullets:
         bullet.draw(display)
@@ -85,8 +114,10 @@ run = True
 bullets = []
 # object generator
 car = Player(225, 350, 100, 216)
-enm = Enemy(100, 100)
-enm2 = Enemy(350, 400)
+enm = Enemy(100, -350)
+enm2 = Enemy(225, -350)
+enm3 = Enemy(340, -350)
+enm4 = Enemy(475, -350)
 
 while run:
     clock.tick(18)
