@@ -12,6 +12,11 @@ enemy = pygame.image.load('Car.png')
 
 clock = pygame.time.Clock()
 score = 0
+bullet_sound = pygame.mixer.Sound('bullet.wav')
+hit_sound = pygame.mixer.Sound('hit.wav')
+
+pygame.mixer.music.load('bgcar.mp3')
+pygame.mixer.music.play(-1)
 
 
 class Player(object):
@@ -40,7 +45,23 @@ class Player(object):
             display.blit(move_left[self.bg_count // 3], (self.x, self.y))
             self.bg_count += 1
         self.hitbox = (self.x, self.y, 100, 216)
-        pygame.draw.rect(display, (225, 0, 0), self.hitbox, 2)
+        # pygame.draw.rect(display, (225, 0, 0), self.hitbox, 2)
+
+    def hit(self):
+        self.x = 225
+        self.y = 350
+        font1 = pygame.font.SysFont('comicsans', 100)
+        text = font1.render('-20', True, (255, 0, 0))
+        display.blit(text, (300 - (text.get_width()/2), 250))
+        pygame.display.update()
+        i = 0
+        while i < 200:
+            pygame.time.delay(10)
+            i += 1
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    i = 201
+                    pygame.quit()
 
 
 class Projectile(object):
@@ -74,7 +95,7 @@ class Enemy(object):
             pygame.draw.rect(display, (255, 0, 0), (self.hitbox[0], self.hitbox[1]-20, 50, 10))
             pygame.draw.rect(display, (0, 255, 0), (self.hitbox[0], self.hitbox[1] - 20, 50 - (5 * (10 - self.health)), 10))
             self.hitbox = (self.x, self.y, 91, 211)
-            pygame.draw.rect(display, (225, 0, 0), self.hitbox, 2)
+            # pygame.draw.rect(display, (225, 0, 0), self.hitbox, 2)
 
     def move(self):
         if self.y < 600:
@@ -87,15 +108,13 @@ class Enemy(object):
                     self.vel += 1
 
     def hit(self):
+        hit_sound.play()
         if self.health > 0:
             self.health -= 1
         else:
             self.visible = False
-            # self.health = 10
             global score
             score += 1
-
-        print('hit')
 
 
 car1 = True
@@ -129,8 +148,8 @@ def effect(display):
 # main loop
 def game_window():
     car.move(display)
-    text = font.render('Score: ' + str(score), 1, (0, 0, 0))
-    display.blit(text, (500, 10))
+    text = font.render('Score: ' + str(score), True, (0, 0, 0))
+    display.blit(text, (300, 20))
     effect(display)
 
     for bullet in bullets:
@@ -152,29 +171,53 @@ enm4 = Enemy(475, -350)
 
 while run:
     clock.tick(18)
+    # hit with car1
+    if car.hitbox[1] < enm.hitbox[1] + enm.hitbox[3] and car.hitbox[1] + car.hitbox[3] > enm.hitbox[1]:
+        if car.hitbox[0] + car.hitbox[2] > enm.hitbox[0] and car.hitbox[0] < enm.hitbox[0] + enm.hitbox[2]:
+            car.hit()
+            score -= 20
+    # hit with car2
+    if car.hitbox[1] < enm2.hitbox[1] + enm2.hitbox[3] and car.hitbox[1] + car.hitbox[3] > enm2.hitbox[1]:
+        if car.hitbox[0] + car.hitbox[2] > enm2.hitbox[0] and car.hitbox[0] < enm2.hitbox[0] + enm2.hitbox[2]:
+            car.hit()
+            score -= 20
+            enm2.y = -200
+    # hit with car3
+    if car.hitbox[1] < enm3.hitbox[1] + enm3.hitbox[3] and car.hitbox[1] + car.hitbox[3] > enm3.hitbox[1]:
+        if car.hitbox[0] + car.hitbox[2] > enm3.hitbox[0] and car.hitbox[0] < enm3.hitbox[0] + enm3.hitbox[2]:
+            car.hit()
+            score -= 20
+    # hit with car4
+    if car.hitbox[1] < enm4.hitbox[1] + enm4.hitbox[3] and car.hitbox[1] + car.hitbox[3] > enm4.hitbox[1]:
+        if car.hitbox[0] + car.hitbox[2] > enm4.hitbox[0] and car.hitbox[0] < enm4.hitbox[0] + enm4.hitbox[2]:
+            car.hit()
+            score -= 20
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
 
     for bullet in bullets:
+        # enemy1 hit with bullets
         if bullet.y - bullet.radius < enm.hitbox[1] + enm.hitbox[3] and bullet.y + bullet.radius > enm.hitbox[1]:
             if bullet.x + bullet.radius > enm.hitbox[0] and bullet.x - bullet.radius < enm.hitbox[0] + enm.hitbox[2]:
                 enm.hit()
                 if enm.visible:
                     bullets.pop(bullets.index(bullet))
 
+        # enemy2 hit with bullets
         if bullet.y - bullet.radius < enm2.hitbox[1] + enm2.hitbox[3] and bullet.y + bullet.radius > enm2.hitbox[1]:
             if bullet.x + bullet.radius > enm2.hitbox[0] and bullet.x - bullet.radius < enm2.hitbox[0] + enm2.hitbox[2]:
                 enm2.hit()
                 if enm2.visible:
                     bullets.pop(bullets.index(bullet))
-
+        # enemy3 hit with bullets
         if bullet.y - bullet.radius < enm3.hitbox[1] + enm3.hitbox[3] and bullet.y + bullet.radius > enm3.hitbox[1]:
             if bullet.x + bullet.radius > enm3.hitbox[0] and bullet.x - bullet.radius < enm3.hitbox[0] + enm3.hitbox[2]:
                 enm3.hit()
                 if enm3.visible:
                     bullets.pop(bullets.index(bullet))
-
+        # enemy4 hit with bullets
         if bullet.y - bullet.radius < enm4.hitbox[1] + enm4.hitbox[3] and bullet.y + bullet.radius > enm4.hitbox[1]:
             if bullet.x + bullet.radius > enm4.hitbox[0] and bullet.x - bullet.radius < enm4.hitbox[0] + enm4.hitbox[2]:
                 enm4.hit()
@@ -189,6 +232,7 @@ while run:
     keys = pygame.key.get_pressed()
 
     if keys[pygame.K_SPACE]:
+        bullet_sound.play()
         if len(bullets) < 500:
             bullets.append(Projectile(round(car.x + car.width//2), round(car.y), 4, (0, 0, 0)))
     # left arrow key input
